@@ -5,6 +5,9 @@ export const getEventsList = createAsyncThunk(
   "/getEventsList",
   async ({ page }: { page: number }) => {
     const limit = 5;
+
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     const response = await dashboardService.getEventList()
     // return response;
 

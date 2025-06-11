@@ -4,6 +4,7 @@ export interface DashboardTileDto {
     host: string
     venue: string
     date: string
+    attendees?: string[]
 }
 
 // interface DashboardTileUserDto {

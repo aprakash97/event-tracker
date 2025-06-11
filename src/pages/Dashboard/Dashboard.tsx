@@ -2,43 +2,49 @@ import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from '../../redux/store'
 import { useEffect, useState } from 'react'
 import { getEventsList } from '../../redux/action/dashboardAction'
-// import { resetState, setStateNumber } from '../../redux/slice/dashboardSlice'
-// import { EVENT_DATA } from '../../utilities/constants';
-// import EventBox from '../../components/Dashboard/EventBox';
+import { setFilter } from '../../redux/slice/dashboardSlice'
+import type { DashboardTileDto } from '../../utilities/models'
 
 const Dashboard = () => {
     const dashboardState = useSelector((state: RootState) => state.dashboard)
     const dispatch = useDispatch<AppDispatch>()
 
     const [selectedHost, setSelectedHost] = useState<undefined | string>(undefined)
-    const [page, setPage] = useState(1);
-    // const [isFiltered, setIsFiltered] = useState(false)
+    const [page, setPage] = useState(1)
+    const [isFiltered, setIsFiltered] = useState(false)
+    const [selectedEvent, setSelectedEvent] = useState<DashboardTileDto | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
-    // const increase = () => {
-    //     dispatch(setStateNumber())
-    // }
-
-
-    // const reset = () => {
-    //     dispatch(resetState())
-    // }
-
-
-    // useEffect(() => {
-    //     dispatch(getEventsList())
-    // }, [])
-
-    // const setHostNameFilter = () => {
-
-    // }
+    const onFilter = () => {
+        setIsFiltered(true)
+        dispatch(setFilter(selectedHost))
+    }
 
     useEffect(() => {
         dispatch(getEventsList({ page }));
     }, [page]);
 
+    const handleEventClick = (event: DashboardTileDto) => {
+        setSelectedEvent(event);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedEvent(null);
+    };
+
+    if (dashboardState.isLoading) {
+        return (
+            <div className="event-table">
+                <h2>LOADING …</h2>
+            </div>
+        );
+    }
+
     return (
-        <div className='past-orders'>
-            <h1>Dashboard</h1>
+        <div className='event-table'>
+            <h2>Dashboard</h2>
             <form>
                 <label htmlFor="pizza-type">Host Name</label>
                 <select
@@ -55,24 +61,6 @@ const Dashboard = () => {
                         </option>
                     ))}
                 </select>
-
-                {/* <label htmlFor="filter-start">Start date:</label>
-                <input
-                    type="date"
-                    id="start"
-                    name="event-start"
-                    value="2018-07-22"
-                    min="2018-01-01"
-                    max="2018-12-31" />
-
-                <label htmlFor="filter-end">End date:</label>
-                <input
-                    type="date"
-                    id="filter-end"
-                    name="event-end"
-                    value="2018-07-22"
-                    min="2018-01-01"
-                    max="2018-12-31" /> */}
                 <div style={{
                     display: 'flex',
                     flexWrap: 'wrap',
@@ -80,10 +68,14 @@ const Dashboard = () => {
                     gap: '1rem',
                     padding: '1rem'
                 }}>
-                    <button style={{ padding: '0.5rem 1rem' }}>Filter</button>
+                    <button style={{ padding: '0.5rem 1rem' }} disabled={isFiltered} onClick={(e) => {
+                        e.preventDefault()
+                        onFilter()
+                    }}>Filter</button>
                     <button style={{ padding: '0.5rem 1rem' }}>Reset</button>
                 </div>
             </form>
+
 
             <table>
                 <thead>
@@ -95,8 +87,21 @@ const Dashboard = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {dashboardState.eventListData.map((event) => (
-                        <tr key={event.id}>
+                    {!isFiltered && dashboardState.eventListData.map((event) => (
+                        <tr key={event.id} onClick={() => handleEventClick(event)}>
+                            <td>
+                                {/* <button onClick={() => setFocusedOrder(order.order_id)}>
+                                    {order.order_id}
+                                </button> */}
+                                {event.title}
+                            </td>
+                            <td>{event.venue}</td>
+                            <td>{event.host}</td>
+                            <td>{event.date}</td>
+                        </tr>
+                    ))}
+                    {isFiltered && dashboardState.eventListFilterData.map((event) => (
+                        <tr key={event.id} onClick={() => handleEventClick(event)}>
                             <td>
                                 {/* <button onClick={() => setFocusedOrder(order.order_id)}>
                                     {order.order_id}
@@ -110,15 +115,29 @@ const Dashboard = () => {
                     ))}
                 </tbody>
             </table>
-            <div className="pages">
-                <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-                    Previous
-                </button>
-                <div>{page}</div>
-                <button disabled={page === dashboardState.totalPages} onClick={() => setPage(page + 1)}>
-                    Next
-                </button>
-            </div>
+            {!isFiltered && (
+                <div className="pages">
+                    <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                        Previous
+                    </button>
+                    <div>{page}</div>
+                    <button disabled={page === dashboardState.totalPages} onClick={() => setPage(page + 1)}>
+                        Next
+                    </button>
+                </div>
+            )}
+
+            {isModalOpen && selectedEvent && (
+                <div id='modal'>
+                    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px' }}>
+                        <h2>{selectedEvent.title} Details</h2>
+                        <p><strong>Venue:</strong> {selectedEvent.venue}</p>
+                        <p><strong>Attendees:</strong>{selectedEvent.attendees?.length === 0 ? "No Attendees" : selectedEvent.attendees?.map((attendee) => attendee.toUpperCase()).join(",")}</p>
+                        <button onClick={closeModal}>Close</button>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

@@ -7,6 +7,6 @@ export interface DashboardStateProps {
     eventListData: DashboardTileDto[]
     eventListFilterData: DashboardTileDto[]
     hostData: string[]
-    currentPage: number
     totalPages: number
+    attendees?: string[]
 }
