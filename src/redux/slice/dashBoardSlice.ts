@@ -10,7 +10,6 @@ const initialState: DashboardStateProps = {
   eventListData: [],
   eventListFilterData: [],
   hostData: [],
-  currentPage: 1,
   totalPages: 0,
 };
 
@@ -24,6 +23,9 @@ export const dashboardSlice = createSlice({
     resetState: (state) => {
       state.stateNumber = initialState.stateNumber
     },
+    setFilter: (state, action) => {
+      state.eventListFilterData = state.eventListFilterData.filter((event) => event.host === action.payload)
+    }
   },
 
   extraReducers: (builder) => {
@@ -34,7 +36,7 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getEventsList.fulfilled, (state, action) => {
         state.eventListData = action.payload.items;
-        // state.eventListFilterData = action.payload;
+        state.eventListFilterData = action.payload.fullList;
         state.totalPages = action.payload.totalCount
         state.hostData = action.payload.fullList.map((data: DashboardTileDto) => data.host).filter((value, index, self) => self.indexOf(value) === index)
         state.totalPages = Math.ceil(action.payload.totalCount / 5)
@@ -50,6 +52,7 @@ export const dashboardSlice = createSlice({
 
 export const {
   setStateNumber,
-  resetState
+  resetState,
+  setFilter
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
