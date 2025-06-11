@@ -90,6 +90,7 @@ const Dashboard = () => {
                     <tr>
                         <td>Name</td>
                         <td>Venue</td>
+                        <td>Host</td>
                         <td>Date</td>
                     </tr>
                 </thead>
@@ -103,6 +104,7 @@ const Dashboard = () => {
                                 {event.title}
                             </td>
                             <td>{event.venue}</td>
+                            <td>{event.host}</td>
                             <td>{event.date}</td>
                         </tr>
                     ))}

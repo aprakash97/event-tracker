@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { type DashboardTileDto } from "../../utilities/models";
-import { getEventsList } from "../action/dashboardAction";
 import type { DashboardStateProps } from "../../utilities/interfaces";
+import { getEventsList } from "../action/dashboardAction";
 
 const initialState: DashboardStateProps = {
   stateNumber: 0,
