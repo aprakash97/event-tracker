@@ -7,4 +7,4 @@ privateApiInstance.interceptors.response.use(
     error => { return Promise.reject(error); }
 );
 
-export * from './dashBoardService';
+export * from './dashboardService';

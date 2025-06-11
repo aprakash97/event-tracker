@@ -14,6 +14,6 @@ async function getEventList() {
   }
 }
 
-export const dashBoardService = {
+export const dashboardService = {
     getEventList
 }

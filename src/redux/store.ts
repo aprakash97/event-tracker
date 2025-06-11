@@ -1,11 +1,10 @@
 import { type TypedUseSelectorHook, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-
-import dashBoardSlice from './slice/dashBoardSlice';
+import { dashboardSlice } from './slice/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
-    dashboard: dashBoardSlice,
+    dashboard: dashboardSlice.reducer
   },
 });
 

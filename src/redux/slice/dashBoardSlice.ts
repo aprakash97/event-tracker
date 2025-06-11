@@ -1,23 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { DashboardTileDto } from "../../utilities/models";
-import { getEventsList } from "../action/dashBoardAction";
+import { type DashboardTileDto } from "../../utilities/models";
+import { getEventsList } from "../action/dashboardAction";
+import type { DashboardStateProps } from "../../utilities/interfaces";
 
-export interface initialStateProps {
-  stateNumber: number
-  isLoading: boolean
-  hasError: boolean
-  eventListData: DashboardTileDto[]
-}
-
-const initialState: initialStateProps = {
+const initialState: DashboardStateProps = {
   stateNumber: 0,
   isLoading: false,
   hasError: false,
-  eventListData: []
+  eventListData: [],
+  eventListFilterData: [],
+  hostData: [],
+  currentPage: 1,
+  totalPages: 0,
 };
 
-
-export const dashBoardSlice = createSlice({
+export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
@@ -26,7 +23,7 @@ export const dashBoardSlice = createSlice({
     },
     resetState: (state) => {
       state.stateNumber = initialState.stateNumber
-    }
+    },
   },
 
   extraReducers: (builder) => {
@@ -36,7 +33,11 @@ export const dashBoardSlice = createSlice({
         state.hasError = false;
       })
       .addCase(getEventsList.fulfilled, (state, action) => {
-        state.eventListData = action.payload;
+        state.eventListData = action.payload.items;
+        // state.eventListFilterData = action.payload;
+        state.totalPages = action.payload.totalCount
+        state.hostData = action.payload.fullList.map((data: DashboardTileDto) => data.host).filter((value, index, self) => self.indexOf(value) === index)
+        state.totalPages = Math.ceil(action.payload.totalCount / 5)
         state.isLoading = false;
         state.hasError = false;
       })
@@ -50,5 +51,5 @@ export const dashBoardSlice = createSlice({
 export const {
   setStateNumber,
   resetState
-} = dashBoardSlice.actions;
-export default dashBoardSlice.reducer;
+} = dashboardSlice.actions;
+export default dashboardSlice.reducer;
